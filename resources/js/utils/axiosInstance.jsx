@@ -86,8 +86,8 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-    baseURL: "http://127.0.0.1:8000",
-    withCredentials: true,
+    baseURL: "https://setbizsolution.com", // Update to your backend URL 
+    withCredentials: true, // VERY important for Sanctum
     headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -95,6 +95,14 @@ const axiosInstance = axios.create({
     },
 });
 
-axiosInstance.get("/sanctum/csrf-cookie");
+// Automatically fetch CSRF cookie before any state-changing request
+axiosInstance.interceptors.request.use(async (config) => {
+    const method = config.method?.toUpperCase();
+    if (["POST", "PUT", "PATCH", "DELETE"].includes(method)) {
+        await axiosInstance.get("/sanctum/csrf-cookie");
+    }
+    return config;
+});
 
 export default axiosInstance;
+                                
