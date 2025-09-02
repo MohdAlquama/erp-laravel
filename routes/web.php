@@ -35,6 +35,8 @@ use App\Http\Controllers\subAdmin\createAdminController;
 //  use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\Admin\BatchController;
+
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 // ---------------- Simple Test POST Routes ----------------
@@ -141,7 +143,19 @@ Route::prefix('admin')->middleware(['newrole:CollegeAdmin'])->group(function () 
     Route::delete('/{adminId}/batch/{batchId}/assignments/{assignmentId}', [BatchViewController::class, 'deleteAssignment']);
     Route::put('/{adminId}/batch/{batchId}/assignments/{assignmentId}', [BatchViewController::class, 'editAssignment']);
     Route::delete('/{adminId}/batch/{batchId}/teachers/{teacherId}', [BatchViewController::class, 'removeTeacherFromBatch']);
+// batch
+///
+// Route::get('/{id}/batches', [App\Http\Controllers\Admin\BatchShifting\BatchesController::class, 'index']);
+// ---------------- Batch Shift Log History ----------------
+Route::get('/batch-shift-logs/{studentId}', [App\Http\Controllers\Admin\BatchShifting\BatchShiftingController::class, 'getBatchShiftLogs'])
+    ->name('admin.batch.shift.logs');
+Route::get('/{adminId}/batch-shift-logs', [App\Http\Controllers\Admin\BatchShifting\BatchShiftingController::class, 'getAllBatchShiftLogs']);
 
+Route::post('/batches/shift', [App\Http\Controllers\Admin\BatchShifting\BatchShiftingController::class, 'shiftStudents'])->name('admin.batches.shift');
+
+Route::get('/batches/shift/{adminId}/{batchId}/{session}', [App\Http\Controllers\Admin\BatchShifting\BatchShiftingController::class, 'getStudentsByBatchAndSession'])->name('admin.batch.index');
+Route::get('/batches/shift', [App\Http\Controllers\Admin\BatchShifting\BatchShiftingController::class, 'index'])->name('admin.batches.shift.index');
+//
     // Admin Dashboard Page
     Route::get('/t', function (Request $request) {
         $admin = $request->session()->get('admin');
@@ -252,6 +266,7 @@ Route::prefix('admin')->middleware(['newrole:CollegeAdmin'])->group(function () 
 
     Route::post('/student', [StudentController::class, 'store']);
     Route::delete('/admin/{adminId}/students/{studentId}', [StudentController::class, 'destroy']);
+    
 
     Route::put('/students/{student}', [StudentController::class, 'update']);
     Route::get('/{adminId}/students', [StudentController::class, 'getByAdmin']);
@@ -323,12 +338,17 @@ Route::prefix('teacher')->middleware(['teacher'])->group(function () {
             'teacher' => Session::get('teacher')
         ]);
     });
+    // 
+    Route::get('/teacher/students', [BatchController::class, 'getStudents'])->name('teacher.students');
+
+    Route::get('/');
     Route::get('/{id}/batches', [BatchesController::class, 'index']);
 
     Route::get('/{id}', function ($id) {
         $teacher = Teachers::findOrFail($id);
         return response()->json($teacher);
     });
+
     Route::get('/students/admin/{adminId}/batch/{batchId}', [AddentanceController::class, 'getStudentsByAdminAndBatch']);
 
     Route::post('/attendance', [AddentanceController::class, 'store']);
