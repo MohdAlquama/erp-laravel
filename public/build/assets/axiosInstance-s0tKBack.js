@@ -1,1 +1,0 @@
-import{a as t}from"./app-Wa6lWOWG.js";const e=t.create({baseURL:"http://127.0.0.1:8000",withCredentials:!0,headers:{"Content-Type":"application/json",Accept:"application/json","X-Requested-With":"XMLHttpRequest"}});e.get("/sanctum/csrf-cookie");export{e as a};
